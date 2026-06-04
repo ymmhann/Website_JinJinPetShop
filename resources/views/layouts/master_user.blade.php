@@ -270,6 +270,48 @@
         .hb-menu nav > ul > li > a::after {
             content: none !important;
         }
+        
+        /* Nút Messenger lơ lửng (Phase 1) */
+        .floating-messenger {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #006AFF, #00E4FF);
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 106, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .floating-messenger:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 106, 255, 0.6);
+        }
+        .floating-messenger::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(0, 106, 255, 0.3);
+            z-index: -1;
+            animation: messenger-ping 2s infinite;
+        }
+        @keyframes messenger-ping {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.4);
+                opacity: 0;
+            }
+        }
     </style>
 
 </head>
@@ -286,14 +328,15 @@
             <div class="container">
                 <div class="row">
                     <!-- Begin Header Top Left Area -->
-                    <div class="col-lg-3 col-md-4">
-                        <div class="header-top-left">
-                            
+                    <div class="col-lg-6 col-md-6">
+                        <div class="header-top-left" style="padding: 10px 0;">
+                            <span style="margin-right: 15px; font-weight: 500; font-size: 13px;"><i class="fa fa-phone" style="color: #fedc19; margin-right: 6px;"></i>Hotline: <strong>0584 246 834</strong></span>
+                            <span style="font-weight: 500; font-size: 13px;"><i class="fa fa-envelope-o" style="color: #fedc19; margin-right: 6px;"></i>Email: <strong>support@jinjin.vn</strong></span>
                         </div>
                     </div>
                     <!-- Header Top Left Area End Here -->
                     <!-- Begin Header Top Right Area -->
-                    <div class="col-lg-9 col-md-8">
+                    <div class="col-lg-6 col-md-6">
                         <div class="header-top-right">
                             <ul class="ht-menu">
                                 <!-- Begin Setting Area -->
@@ -353,17 +396,17 @@
                             <ul class="hm-menu" id="cart-icon">
                                 <!-- Begin Header Mini Cart Area -->
                                 <li class="hm-minicart">
-                                    <div class="hm-minicart-trigger" style="background: #2c3e50; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative !important;">
+                                    <a href="{{ route('web.list.product.cart') }}" class="hm-minicart-trigger" style="background: #2c3e50; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); position: relative !important; display: block; text-decoration: none;">
                                         <span class="item-icon" style="color: #fedc19;"></span>
-                                        <span class="item-text" style="font-weight: 600;">Giỏ hàng</span>
+                                        <span class="item-text" style="font-weight: 600; color: #fff;">Giỏ hàng</span>
                                         <span class="cart-item-count" style="background: #e80f0f; color: #fff; top: -3px; left: 28px; font-weight: bold; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: absolute !important; width: 20px; height: 20px; line-height: 16px; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center; padding: 0;">
                                             @if(\Illuminate\Support\Facades\Auth::guard('web')->check())
                                                 {{ \Illuminate\Support\Facades\Auth::guard('web')->user()->countListProductInCart() }}
                                             @else
-                                                0
+                                                {{ collect(session('cart', []))->sum() }}
                                             @endif
                                         </span>
-                                    </div>
+                                    </a>
                                 </li>
                                 <!-- Header Mini Cart Area End Here -->
                             </ul>
@@ -396,6 +439,7 @@
                                         </ul>
                                     </li>
                                     <li><a href="{{ route('web.about') }}" style="color: #fff;">Giới thiệu</a></li>
+                                    <li><a href="{{ route('web.pet_calculator') }}" style="color: #fff;">Tính lượng thức ăn</a></li>
                                     <li><a href="{{ route('web.contact') }}" style="color: #fff;">Liên hệ</a></li>
                                 </ul>
                             </nav>
@@ -528,6 +572,10 @@
                                     <span>Email: </span>
                                     <a href="mailto:support@jinjin.vn">support@jinjin.vn</a>
                                 </li>
+                                <li>
+                                    <span>Facebook: </span>
+                                    <a href="https://www.facebook.com/jinjinpetshop.vn" target="_blank">jinjinpetshop.vn</a>
+                                </li>
                             </ul>
                         </div>
                         <!-- Footer Logo Area End Here -->
@@ -593,6 +641,13 @@
     <!-- Footer Area End Here -->
 </div>
 <!-- Body Wrapper End Here -->
+
+<!-- Floating Messenger Button (Phase 1) -->
+<a href="https://www.facebook.com/messages/t/419320931442384" target="_blank" class="floating-messenger" title="Trò chuyện với JinJin Pet Food">
+    <svg width="30" height="30" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2C7.373 2 2 6.944 2 13.04c0 3.197 1.467 6.046 3.847 7.973V25.5l4.316-2.368c1.218.337 2.502.518 3.837.518 6.627 0 12-4.944 12-11.04C26 6.944 20.627 2 14 2zm1.26 14.838l-3.06-3.266-5.966 3.266 6.55-6.953 3.11 3.266 5.916-3.266-6.55 6.953z" fill="white"/>
+    </svg>
+</a>
 <!-- jQuery-V1.12.4 -->
 <script src="{{ asset('theme/user/js/vendor/jquery-1.12.4.min.js') }}"></script>
 <!-- Popper js -->

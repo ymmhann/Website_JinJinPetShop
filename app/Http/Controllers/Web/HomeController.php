@@ -50,4 +50,8 @@ class HomeController extends Controller
     public function contact() {
         return view('web.contact.index');
     }
+
+    public function petCalculator() {
+        return view('web.calculator.index');
+    }
 }

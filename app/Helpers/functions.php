@@ -5,11 +5,112 @@ use Illuminate\Support\Facades\DB;
 function updateImage($imageFile, $imageName, $imagePath) {
     if (!empty($imageFile) && $imageFile instanceof UploadedFile) {
         $file = $imageFile;
-        $ext = $file->extension();
+        $ext = strtolower($file->extension());
+        
+        // Tạo tên file
         $fileName =  $imageName . '.' . $ext;
-        $file->move(public_path($imagePath), $fileName);
-
-        return $imagePath . '/' . $fileName;
+        $targetDir = public_path($imagePath);
+        
+        // Tạo thư mục nếu chưa tồn tại
+        if (!file_exists($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
+        
+        $targetPath = $targetDir . '/' . $fileName;
+        
+        // Đọc ảnh gốc tùy thuộc vào định dạng
+        $srcImage = null;
+        $realPath = $file->getRealPath();
+        
+        switch ($ext) {
+            case 'jpg':
+            case 'jpeg':
+                $srcImage = @imagecreatefromjpeg($realPath);
+                break;
+            case 'png':
+                $srcImage = @imagecreatefrompng($realPath);
+                break;
+            case 'gif':
+                $srcImage = @imagecreatefromgif($realPath);
+                break;
+            case 'webp':
+                if (function_exists('imagecreatefromwebp')) {
+                    $srcImage = @imagecreatefromwebp($realPath);
+                }
+                break;
+        }
+        
+        if ($srcImage) {
+            // Lấy kích thước gốc
+            $srcWidth = imagesx($srcImage);
+            $srcHeight = imagesy($srcImage);
+            
+            // Tính toán tọa độ crop và kích thước crop hình vuông
+            if ($srcWidth > $srcHeight) {
+                $cropSize = $srcHeight;
+                $srcX = (int)(($srcWidth - $srcHeight) / 2);
+                $srcY = 0;
+            } else {
+                $cropSize = $srcWidth;
+                $srcX = 0;
+                $srcY = (int)(($srcHeight - $srcWidth) / 2);
+            }
+            
+            // Kích thước đích (ví dụ 600x600 px)
+            $destSize = 600;
+            $destImage = imagecreatetruecolor($destSize, $destSize);
+            
+            // Giữ độ trong suốt đối với ảnh PNG và WebP
+            if ($ext === 'png' || $ext === 'webp') {
+                imagealphablending($destImage, false);
+                imagesavealpha($destImage, true);
+                $transparent = imagecolorallocatealpha($destImage, 255, 255, 255, 127);
+                imagefilledrectangle($destImage, 0, 0, $destSize, $destSize, $transparent);
+            }
+            
+            // Tiến hành copy và resize
+            imagecopyresampled(
+                $destImage, 
+                $srcImage, 
+                0, 0, 
+                $srcX, $srcY, 
+                $destSize, $destSize, 
+                $cropSize, $cropSize
+            );
+            
+            // Lưu ảnh đích
+            switch ($ext) {
+                case 'jpg':
+                case 'jpeg':
+                    imagejpeg($destImage, $targetPath, 90);
+                    break;
+                case 'png':
+                    imagepng($destImage, $targetPath, 6);
+                    break;
+                case 'gif':
+                    imagegif($destImage, $targetPath);
+                    break;
+                case 'webp':
+                    if (function_exists('imagewebp')) {
+                        imagewebp($destImage, $targetPath, 90);
+                    } else {
+                        imagepng($destImage, $targetPath, 6);
+                    }
+                    break;
+                default:
+                    $file->move($targetDir, $fileName);
+                    break;
+            }
+            
+            imagedestroy($srcImage);
+            imagedestroy($destImage);
+            
+            return $imagePath . '/' . $fileName;
+        } else {
+            // Fallback: Di chuyển file trực tiếp nếu không xử lý được qua GD
+            $file->move($targetDir, $fileName);
+            return $imagePath . '/' . $fileName;
+        }
     }
 
     return '';

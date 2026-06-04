@@ -26,7 +26,7 @@
                                     <div class="checkout-form-list">
                                         <label>Họ tên:@include('admin.include.required_icon')</label>
                                         <input placeholder="" type="text" name="name"
-                                               value="{{ \Illuminate\Support\Facades\Auth::guard('web')->user()->name }}">
+                                               value="{{ optional(\Illuminate\Support\Facades\Auth::guard('web')->user())->name }}">
                                         @error('name')
                                         <p class="alert alert-danger mt-2">{{ $message }}</p>
                                         @enderror
@@ -52,7 +52,7 @@
                                     <div class="checkout-form-list">
                                         <label>Địa chỉ @include('admin.include.required_icon')</label>
                                         <input placeholder="Địa chỉ" type="text" name="address"
-                                               value="{{ \Illuminate\Support\Facades\Auth::guard('web')->user()->address }}">
+                                               value="{{ optional(\Illuminate\Support\Facades\Auth::guard('web')->user())->address }}">
                                         @error('address')
                                         <p class="alert alert-danger mt-2">{{ $message }}</p>
                                         @enderror
@@ -62,7 +62,7 @@
                                     <div class="checkout-form-list">
                                         <label>Email:@include('admin.include.required_icon')</label>
                                         <input placeholder="" type="email" name="email"
-                                               value="{{ \Illuminate\Support\Facades\Auth::guard('web')->user()->email }}">
+                                               value="{{ optional(\Illuminate\Support\Facades\Auth::guard('web')->user())->email }}">
                                         @error('email')
                                         <p class="alert alert-danger mt-2">{{ $message }}</p>
                                         @enderror
@@ -72,7 +72,7 @@
                                     <div class="checkout-form-list">
                                         <label>Số điện thoại:@include('admin.include.required_icon')</label>
                                         <input type="text" name="phone"
-                                               value="{{ \Illuminate\Support\Facades\Auth::guard('web')->user()->phone }}">
+                                               value="{{ optional(\Illuminate\Support\Facades\Auth::guard('web')->user())->phone }}">
                                         @error('phone')
                                         <p class="alert alert-danger mt-2">{{ $message }}</p>
                                         @enderror

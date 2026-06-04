@@ -24,6 +24,34 @@ class  OrderController extends Controller
             }
         }
 
+        // RÀNG BUỘC 1: Cùng một số điện thoại không được phép tạo nhiều đơn hàng trong vòng 5 phút
+        $fiveMinutesAgo = Carbon::now()->subMinutes(5);
+        $existsOrderPhone = DB::table('orders')
+            ->where('phone', $request->phone)
+            ->where('created_at', '>=', $fiveMinutesAgo)
+            ->exists();
+        if ($existsOrderPhone) {
+            return redirect()->back()->withInput()->with('error', 'Số điện thoại này vừa đặt hàng trong vòng 5 phút qua. Vui lòng đợi trước khi đặt đơn tiếp theo.');
+        }
+
+        // RÀNG BUỘC 2: Cùng một IP không được phép liên tục tạo đơn hàng sử dụng nhiều số điện thoại khác nhau (tối đa 3 SĐT trong 15 phút)
+        $ipAddress = $request->ip();
+        $cacheKey = 'checkout_phones_by_ip_' . md5($ipAddress);
+        $usedPhones = cache()->get($cacheKey, []);
+        $now = time();
+        $usedPhones = array_filter($usedPhones, function ($timestamp) use ($now) {
+            return ($now - $timestamp) < 900;
+        });
+        $phone = $request->phone;
+        if (!isset($usedPhones[$phone])) {
+            $usedPhones[$phone] = $now;
+        }
+        if (count($usedPhones) > 3) {
+            cache()->put($cacheKey, $usedPhones, 900);
+            return redirect()->back()->withInput()->with('error', 'Phát hiện hoạt động bất thường từ thiết bị của bạn. Không được đặt hàng liên tục bằng nhiều số điện thoại.');
+        }
+        cache()->put($cacheKey, $usedPhones, 900);
+
         $user = Auth::guard('web')->user();
         $dataOrder = $request->except(['list_product', '_token']);
         $listProductRequest = $request->get('list_product');
@@ -42,7 +70,7 @@ class  OrderController extends Controller
             }
         }
 
-        $dataOrder['user_id'] = $user->id;
+        $dataOrder['user_id'] = $user ? $user->id : null;
         $dataOrder['created_at'] = Carbon::now();
         $dataOrder['id'] = time() * rand(1111111, 99999999);
 
@@ -65,9 +93,19 @@ class  OrderController extends Controller
 
         if (!empty($orderProductInsert)) {
             DB::table('order_products')->insert($orderProductInsert);
-            DB::table('carts')->whereIn('product_id', array_column($listProductRequest, 'id'))
-                ->where('user_id', '=', $user->id)
-                ->delete();
+            if ($user) {
+                DB::table('carts')->whereIn('product_id', array_column($listProductRequest, 'id'))
+                    ->where('user_id', '=', $user->id)
+                    ->delete();
+            } else {
+                $cart = session()->get('cart', []);
+                foreach (array_column($listProductRequest, 'id') as $pId) {
+                    if (isset($cart[$pId])) {
+                        unset($cart[$pId]);
+                    }
+                }
+                session()->put('cart', $cart);
+            }
         }
 
         $order = Order::find($orderId);
@@ -101,9 +139,15 @@ class  OrderController extends Controller
             }
         }
 
-        Mail::send('emails.create_order', ['order' => $order], function ($mess) use ($order){
-             $mess->to($order->User->email, 'Thông báo')->subject('[' . env('APP_NAME') . ']Thông báo đặt hàng thành công #' . $order->id);
-        });
+        try {
+            Mail::send('emails.create_order', ['order' => $order], function ($mess) use ($order){
+                 $mess->to($order->email, 'Thông báo')->subject('[' . env('APP_NAME') . ']Thông báo đặt hàng thành công #' . $order->id);
+            });
+        } catch (\Exception $e) {
+            // Bỏ qua lỗi gửi mail để tránh cản trở luồng đặt hàng
+        }
+
+        session(['latest_order_id' => $orderId]);
 
         return redirect()->route('web.order_detail', $orderId)->with('success', 'Đặt hàng thành công');
     }
@@ -124,10 +168,14 @@ class  OrderController extends Controller
                     ]);
 
                 $order = Order::find($orderId);
-
-                Mail::send('emails.create_order', ['order' => $order], function ($mess) use ($order){
-                    $mess->to($order->User->email, 'Thông báo')->subject('[' . env('APP_NAME') . ']Thông báo đặt hàng thành công #' . $order->id);
-                });
+ 
+                try {
+                    Mail::send('emails.create_order', ['order' => $order], function ($mess) use ($order){
+                        $mess->to($order->email, 'Thông báo')->subject('[' . env('APP_NAME') . ']Thông báo đặt hàng thành công #' . $order->id);
+                    });
+                } catch (\Exception $e) {
+                    // Bỏ qua lỗi gửi mail
+                }
 
                 return redirect()->route('web.order_detail', $orderId)->with('success', 'Thanh toán thành công');
             }
@@ -185,7 +233,15 @@ class  OrderController extends Controller
     }
 
     public function orderDetail(Request $request, int $id) {
-        $order = Order::where('user_id', Auth::guard('web')->user()->id)->find($id);
+        if (Auth::guard('web')->check()) {
+            $order = Order::where('user_id', Auth::guard('web')->user()->id)->find($id);
+        } else {
+            if (session('latest_order_id') == $id) {
+                $order = Order::whereNull('user_id')->find($id);
+            } else {
+                $order = null;
+            }
+        }
 
         if (!$order) {
             abort(404);
@@ -195,7 +251,15 @@ class  OrderController extends Controller
     }
 
     public function updateStatusOrder(Request $request, int $id) {
-        $order = Order::where('user_id', Auth::guard('web')->user()->id)->find($id);
+        if (Auth::guard('web')->check()) {
+            $order = Order::where('user_id', Auth::guard('web')->user()->id)->find($id);
+        } else {
+            if (session('latest_order_id') == $id) {
+                $order = Order::whereNull('user_id')->find($id);
+            } else {
+                $order = null;
+            }
+        }
 
         if (!$order) {
             abort(404);

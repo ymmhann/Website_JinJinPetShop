@@ -45,27 +45,27 @@ Route::group(['middleware' => ['checkStatusUser']], function () {
     Route::get('about', [\App\Http\Controllers\Web\HomeController::class, 'about'])->name('about');
 
     Route::get('contact', [\App\Http\Controllers\Web\HomeController::class, 'contact'])->name('contact');
+    Route::get('pet-food-calculator', [\App\Http\Controllers\Web\HomeController::class, 'petCalculator'])->name('pet_calculator');
 
     Route::get('add-cart', [\App\Http\Controllers\Web\CartController::class, 'addCart'])
-        ->name('cart.add')
-        ->middleware('isLoginWebAjax');
-});
+        ->name('cart.add');
 
-Route::group(['middleware' => ['auth:web', 'checkStatusUser']], function () {
     Route::get('cart', [\App\Http\Controllers\Web\CartController::class, 'listProductInCart'])->name('list.product.cart');
-
     Route::get('delete', [\App\Http\Controllers\Web\CartController::class, 'deleteProductCart'])->name('delete.product.cart');
 
-    Route::post('create-order', [\App\Http\Controllers\Web\OrderController::class, 'createOrder'])->name('create.order');
     Route::get('checkout', [\App\Http\Controllers\Web\OrderController::class, 'checkOut'])->name('checkout.order');
+    Route::post('create-order', [\App\Http\Controllers\Web\OrderController::class, 'createOrder'])->name('create.order');
     Route::get('order-success', [\App\Http\Controllers\Web\OrderController::class, 'success'])->name('success.order');
     Route::get('order-error', [\App\Http\Controllers\Web\OrderController::class, 'error'])->name('error.order');
-
-    Route::get('profile', [\App\Http\Controllers\Web\ProfileController::class, 'showFormProfile'])->name('profile');
-    Route::post('profile/{id}', [\App\Http\Controllers\Web\ProfileController::class, 'profile'])->name('profile.post');
     Route::get('momo-return', [\App\Http\Controllers\Web\OrderController::class, 'momoReturn'])->name('momo_return');
-
-    Route::get('list-order', [\App\Http\Controllers\Web\OrderController::class, 'listOrderOfUser'])->name('list_order_of_user');
     Route::get('order/{id}', [\App\Http\Controllers\Web\OrderController::class, 'orderDetail'])->name('order_detail');
     Route::post('order/{id}', [\App\Http\Controllers\Web\OrderController::class, 'updateStatusOrder'])->name('order_update_status');
 });
+
+Route::group(['middleware' => ['auth:web', 'checkStatusUser']], function () {
+    Route::get('profile', [\App\Http\Controllers\Web\ProfileController::class, 'showFormProfile'])->name('profile');
+    Route::post('profile/{id}', [\App\Http\Controllers\Web\ProfileController::class, 'profile'])->name('profile.post');
+
+    Route::get('list-order', [\App\Http\Controllers\Web\OrderController::class, 'listOrderOfUser'])->name('list_order_of_user');
+});
+

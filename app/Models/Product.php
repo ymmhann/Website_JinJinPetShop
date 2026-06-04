@@ -124,4 +124,31 @@ class Product extends Model
 
         return $this->quantity - $quantityInOrder;
     }
+
+    public function getListProductRelatedCategory() {
+        $currentCatId = $this->category_id;
+        
+        // Cấu hình danh mục thức ăn và phụ kiện
+        $foodCatIds = [2, 3]; // Sản phẩm cho mèo, cho chó
+        $accessoryCatIds = [8, 9, 10]; // Chén ăn bình nước, Vòng yếm dây dắt, Balo lồng vận chuyển
+        
+        $relatedCatIds = [];
+        if (in_array($currentCatId, $foodCatIds)) {
+            $relatedCatIds = $accessoryCatIds;
+        } elseif (in_array($currentCatId, $accessoryCatIds)) {
+            $relatedCatIds = $foodCatIds;
+        } else {
+            // Dự phòng: Lấy các danh mục khác danh mục hiện tại
+            $relatedCatIds = Category::where('id', '!=', $currentCatId)->pluck('id')->toArray();
+        }
+
+        return Product::with(['Category', 'listProductChild'])
+            ->whereIn('category_id', $relatedCatIds)
+            ->where('id', '!=', $this->id)
+            ->where('parent_id', '=', null)
+            ->where('status', '=', 1)
+            ->inRandomOrder()
+            ->take(8)
+            ->get();
+    }
 }

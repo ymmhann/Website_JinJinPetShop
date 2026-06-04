@@ -617,6 +617,18 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Section Bạn có thể cần thêm (Phase 4) -->
+            <section class="related-products-section mt-5 pb-5">
+                <div class="related-products-title">Bạn có thể cần thêm</div>
+                <div class="row">
+                    <div class="product-active owl-carousel">
+                        @foreach($product->getListProductRelatedCategory() as $productItem)
+                            @include('web.include.item_product', ['product' => $productItem])
+                        @endforeach
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 @endsection
@@ -805,25 +817,8 @@
                 });
             });
 
-            // Xử lý Mua ngay
+            // Xử lý Mua ngay (Phase 2 Guest Checkout)
             $('.btn-buy-now').click(function () {
-                const isAuthenticated = @json(\Illuminate\Support\Facades\Auth::guard('web')->check());
-                if (!isAuthenticated) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Yêu cầu đăng nhập',
-                        text: 'Vui lòng đăng nhập để thực hiện mua ngay',
-                        showCancelButton: true,
-                        confirmButtonText: 'Đăng nhập',
-                        cancelButtonText: 'Hủy'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = @json(route('web.login'));
-                        }
-                    });
-                    return;
-                }
-
                 if (!validateQuantityRealtime()) {
                     return;
                 }

@@ -5429,6 +5429,101 @@ span.required {
 .small-version {
   display: none;
 }
+
+/* Custom Product Image Standardisation CSS */
+.product-image img, 
+.lg-image img, 
+.sm-image img,
+.li-product-thumbnail img,
+.li-review-product img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Custom Premium Header Improvements */
+.header-top {
+  background: #f8f9fa !important;
+  border-bottom: 1px solid #e9ecef !important;
+  position: relative !important;
+  z-index: 99 !important;
+}
+.ht-setting {
+  z-index: 999 !important;
+}
+.header-top-left span {
+  color: #555555 !important;
+  display: inline-block;
+  line-height: 20px;
+}
+.header-top-left span i {
+  font-size: 14px;
+}
+.ht-setting-trigger {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.ht-setting-trigger:hover {
+  color: #ff7f50 !important;
+}
+.hm-searchbox {
+  border: 2px solid #2c3e50 !important;
+  border-radius: 30px !important;
+  overflow: hidden;
+  display: flex;
+}
+.hm-searchbox input {
+  border: none !important;
+  height: 41px !important;
+  padding-left: 20px !important;
+  flex-grow: 1;
+}
+.hm-searchbox .li-btn {
+  background: #2c3e50 !important;
+  color: #fedc19 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: 60px !important;
+  height: 41px !important;
+  transition: all 0.3s ease;
+}
+.hm-searchbox .li-btn:hover {
+  background: #fedc19 !important;
+  color: #2c3e50 !important;
+}
+.hm-minicart-trigger {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.hm-minicart-trigger:hover {
+  background: #fedc19 !important;
+}
+.hm-minicart-trigger:hover .item-text {
+  color: #2c3e50 !important;
+}
+.hm-minicart-trigger:hover .item-icon::before {
+  color: #2c3e50 !important;
+}
+.hb-menu nav > ul > li > a {
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 16px 22px !important;
+  transition: all 0.25s ease-in-out;
+}
+.hb-menu nav > ul > li > a:hover {
+  color: #fedc19 !important;
+}
+.hb-dropdown li a {
+  font-weight: 500 !important;
+  transition: all 0.2s ease;
+}
+.hb-dropdown li a:hover {
+  padding-left: 15px !important;
+  color: #ff7f50 !important;
+}
+
 /*----------------------------------------------------------------------------------------------------*/
 /*------------------------------------------> The End <-----------------------------------------------*/
 /*----------------------------------------------------------------------------------------------------*/
