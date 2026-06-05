@@ -44,7 +44,7 @@
         @foreach($listOrder as $order)
             <tr>
                 <td>{{ $order->id }}</td>
-                <td>{{ $order->User->name }}</td>
+                <td>{{ $order->name ?? ($order->User->name ?? 'Khách vãng lai') }}</td>
                 <th>{{ $order->payment_type }}</th>
                 <td>{!! mapOrderStatus($order->status) !!}</td>
                 <td>{{ $order->created_at }}</td>

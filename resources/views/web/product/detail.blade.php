@@ -607,7 +607,7 @@
             </div>
 
             <!-- Section Sản phẩm tương tự -->
-            <section class="related-products-section">
+            <section class="related-products-section product-area">
                 <div class="related-products-title">Sản phẩm tương tự</div>
                 <div class="row">
                     <div class="product-active owl-carousel">
@@ -619,7 +619,7 @@
             </section>
 
             <!-- Section Bạn có thể cần thêm (Phase 4) -->
-            <section class="related-products-section mt-5 pb-5">
+            <section class="related-products-section product-area mt-5 pb-5">
                 <div class="related-products-title">Bạn có thể cần thêm</div>
                 <div class="row">
                     <div class="product-active owl-carousel">

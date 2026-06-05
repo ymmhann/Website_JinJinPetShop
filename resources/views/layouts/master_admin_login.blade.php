@@ -76,7 +76,7 @@
 
                         <div class="d-flex justify-content-center py-4">
                             <a href="{{ route('admin.login') }}" class="logo d-flex align-items-center w-auto">
-                                <img src="{{ asset('theme/admin/assets/img/logo.png') }}" alt="">
+                                <img src="{{ asset('theme/admin/assets/img/pet_logo.png') }}" alt="">
                                 <span class="d-none d-lg-block">Quản Trị Viên</span>
                             </a>
                         </div><!-- End Logo -->

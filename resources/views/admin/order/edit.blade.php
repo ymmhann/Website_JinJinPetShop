@@ -20,7 +20,7 @@
 
             <tr>
                 <th>Người đặt hàng</th>
-                <td>{{ $order->User->name }}</td>
+                <td>{{ $order->name ?? ($order->User->name ?? 'Khách vãng lai') }}</td>
             </tr>
 
             <tr>
