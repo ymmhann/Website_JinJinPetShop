@@ -285,7 +285,8 @@ function mapStringIsPaid($paymentStatus = 'UNPAID') {
 }
 
 if (!function_exists('getDayFromDateToDate')) {
-    function getDayFromDateToDate($fromDate, $toDate) {
+    
+function getDayFromDateToDate($fromDate, $toDate) {
         $datetime1 = new DateTime($fromDate);
         $datetime2 = new DateTime($toDate);
         $interval = $datetime1->diff($datetime2);

@@ -403,7 +403,7 @@
                                             @if(\Illuminate\Support\Facades\Auth::guard('web')->check())
                                                 {{ \Illuminate\Support\Facades\Auth::guard('web')->user()->countListProductInCart() }}
                                             @else
-                                                {{ collect(session('cart', []))->sum() }}
+                                                {{ collect(session('cart', []))->count() }}
                                             @endif
                                         </span>
                                     </a>

@@ -57,7 +57,7 @@ class User extends Authenticatable
         if ($this->countCartCache !== null) {
             return $this->countCartCache;
         }
-        return $this->countCartCache = $this->listProductInCart->sum('pivot.quantity');
+        return $this->countCartCache = $this->listProductInCart->count();
     }
 
     public function totalMoneyInCart() {

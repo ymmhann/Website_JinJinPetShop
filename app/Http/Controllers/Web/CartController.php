@@ -24,7 +24,7 @@ class CartController extends Controller
                     'message'=>'Sản phẩm không tồn tại',
                     'qty' => Auth::guard('web')->check() 
                         ? Auth::guard('web')->user()->countListProductInCart() 
-                        : collect(session('cart', []))->sum(),
+                        : collect(session('cart', []))->count(),
                 ]
             ]);
         }
@@ -39,7 +39,7 @@ class CartController extends Controller
                     'message'=>'Số lượng không hợp lệ',
                     'qty' => Auth::guard('web')->check() 
                         ? Auth::guard('web')->user()->countListProductInCart() 
-                        : collect(session('cart', []))->sum(),
+                        : collect(session('cart', []))->count(),
                 ]
             ]);
         }
@@ -110,7 +110,7 @@ class CartController extends Controller
                     'success'=>false,
                     'data'=>[
                         'message'=>'Số lượng trong kho không đủ',
-                        'qty' => collect(session('cart', []))->sum(),
+                        'qty' => collect(session('cart', []))->count(),
                     ]
                 ]);
             }
@@ -134,7 +134,7 @@ class CartController extends Controller
                 'success'=>true,
                 'data'=>[
                     'message'=> 'Thêm vào giỏ hàng thành công',
-                    'qty' => collect(session('cart', []))->sum(),
+                    'qty' => collect(session('cart', []))->count(),
                     'total' => $totalMoney,
                     'total_row' => $productPrice * $quantityUpdate
                 ]
